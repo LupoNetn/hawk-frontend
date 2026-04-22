@@ -5,15 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "../../service/auth.service";
-import { Code2, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Code2, Loader2, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,7 +21,6 @@ function LoginForm() {
   useEffect(() => {
     const msg = searchParams.get("message");
     if (msg) {
-      setMessage(msg);
       toast.success(msg);
     }
   }, [searchParams]);
@@ -30,8 +28,6 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
-    setMessage("");
 
     try {
       await login(formData);
@@ -39,12 +35,15 @@ function LoginForm() {
       router.push("/dashboard"); 
     } catch (err: any) {
       const msg = err.message || "Invalid credentials. Please try again.";
-      setError(msg);
       toast.error(msg);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleShowPassword = () => {
+    setShowPassword(prev => !prev)
+  }
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-black">
@@ -113,17 +112,6 @@ function LoginForm() {
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-500 dark:bg-red-500/10 dark:text-red-400">
-                {error}
-              </div>
-            )}
-            {message && (
-              <div className="rounded-lg bg-emerald-50 p-3 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                {message}
-              </div>
-            )}
-            
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                 Email Address
@@ -133,7 +121,7 @@ function LoginForm() {
                 type="email"
                 required
                 className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
-                placeholder="guillermo@vercel.com"
+                placeholder="guillermo@hawk.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -144,19 +132,25 @@ function LoginForm() {
                 <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                   Password
                 </label>
-                <Link href="#" className="text-[10px] font-bold text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
-                  Reset?
-                </Link>
               </div>
-              <input
-                id="password"
-                type="password"
-                required
-                className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <button

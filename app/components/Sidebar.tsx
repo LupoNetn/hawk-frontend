@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
   Webhook, 
@@ -11,10 +11,14 @@ import {
   Settings, 
   LogOut,
   Code2,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X
 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { getMe } from "../service/auth.service";
+import { getMe, logout } from "../service/auth.service";
+import { toast } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
@@ -27,9 +31,16 @@ const secondaryItems = [
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [org, setOrg] = useState<any>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchOrg = async () => {
@@ -43,14 +54,47 @@ export function Sidebar() {
     fetchOrg();
   }, []);
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.success("Successfully logged out");
+      router.push("/login");
+    } catch (err: any) {
+      toast.error("Logout failed. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-zinc-200 bg-white px-4 py-6 dark:border-zinc-800 dark:bg-black">
-      <div className="flex items-center gap-2.5 px-2 mb-10">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white shadow-lg shadow-black/10 dark:shadow-white/5">
-          <Code2 className="h-5 w-5 text-white dark:text-black" />
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col border-r border-zinc-200 bg-white px-4 py-6 transition-transform duration-300 dark:border-zinc-800 dark:bg-black lg:sticky lg:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="flex items-center justify-between px-2 mb-10">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white shadow-lg shadow-black/10 dark:shadow-white/5">
+              <Code2 className="h-5 w-5 text-white dark:text-black" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
+          </div>
+          <button 
+            className="rounded-lg p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 lg:hidden"
+            onClick={onClose}
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-        <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
-      </div>
 
       <div className="flex flex-1 flex-col justify-between">
         <nav className="space-y-1">
@@ -99,11 +143,12 @@ export function Sidebar() {
             );
           })}
           <button
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
-            onClick={() => {/* Handle Logout */}}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-50"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
           >
-            <LogOut className="h-4 w-4" />
-            Sign Out
+            {isLoggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+            {isLoggingOut ? "Signing out..." : "Sign Out"}
           </button>
         </nav>
       </div>
@@ -124,5 +169,6 @@ export function Sidebar() {
         <p className="mt-2 text-[10px] text-zinc-500">6,500 / 10,000 events used</p>
       </div>
     </aside>
+    </>
   );
 }

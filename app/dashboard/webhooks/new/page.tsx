@@ -5,6 +5,7 @@ import { Header } from "../../../components/Header";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { api } from "../../../lib/api";
+import { useDashboard } from "../../DashboardContext";
 import { 
   ArrowLeft, 
   Globe, 
@@ -18,6 +19,7 @@ import Link from "next/link";
 export default function NewWebhookPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { setSidebarOpen } = useDashboard();
   const [formData, setFormData] = useState({
     name: "",
     url: "",
@@ -69,20 +71,20 @@ export default function NewWebhookPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title="Create Webhook" />
+      <Header title="Create Webhook" onMenuClick={() => setSidebarOpen(true)} />
       
-      <div className="mx-auto w-full max-w-3xl p-8 animate-fade-in">
+      <div className="mx-auto w-full max-w-3xl p-4 sm:p-8 animate-fade-in">
         <Link href="/dashboard/webhooks" className="mb-6 flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Back to Endpoints
         </Link>
 
-        <div className="mb-10">
-          <h2 className="text-3xl font-extrabold tracking-tight">New Endpoint</h2>
-          <p className="mt-2 text-zinc-500">Configure where you want Hawk to deliver your event notifications.</p>
+        <div className="mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">New Endpoint</h2>
+          <p className="mt-2 text-sm sm:text-base text-zinc-500">Configure where you want Hawk to deliver your event notifications.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* URL Section */}
           <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/50 shadow-sm">
             <div className="flex items-center gap-3 mb-6">

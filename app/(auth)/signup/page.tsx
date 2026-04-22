@@ -5,13 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signup } from "../../service/auth.service";
-import { Code2, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Code2, Loader2, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +21,6 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       await signup(formData);
@@ -29,7 +28,6 @@ export default function SignupPage() {
       router.push("/login?message=Account created successfully. Please log in.");
     } catch (err: any) {
       const msg = err.message || "Something went wrong. Please try again.";
-      setError(msg);
       toast.error(msg);
     } finally {
       setIsLoading(false);
@@ -103,12 +101,6 @@ export default function SignupPage() {
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-500 dark:bg-red-500/10 dark:text-red-400">
-                {error}
-              </div>
-            )}
-            
             <div className="space-y-1.5">
               <label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                 Full Name
@@ -133,7 +125,7 @@ export default function SignupPage() {
                 type="email"
                 required
                 className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
-                placeholder="guillermo@vercel.com"
+                placeholder="guillermo@hawk.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -143,15 +135,24 @@ export default function SignupPage() {
               <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="block w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-3 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:focus:border-white dark:focus:ring-white transition-all"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <button
