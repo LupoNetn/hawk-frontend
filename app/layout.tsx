@@ -15,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hawk - Reliable Webhook Delivery",
+  title: "Hawk | Reliable Webhook Delivery",
   description: "The modern infrastructure for reliable, secure, and observable webhook delivery.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

@@ -59,10 +59,10 @@ function LoginForm() {
         </div>
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
-              <Code2 className="h-5 w-5 text-black" />
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
+              <img src="/favicon.png" alt="Hawk Logo" className="h-full w-full object-contain invert" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">Hawk</span>
+            <span className="text-2xl font-bold tracking-tight text-white">Hawk</span>
           </Link>
         </div>
 
@@ -97,10 +97,10 @@ function LoginForm() {
         <div className="w-full max-w-sm space-y-8 animate-fade-in">
           <div className="xl:hidden flex justify-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white">
-                <Code2 className="h-5 w-5 text-white dark:text-black" />
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
+                <img src="/favicon.png" alt="Hawk Logo" className="h-full w-full object-contain dark:invert" />
               </div>
-              <span className="text-xl font-bold tracking-tight">Hawk</span>
+              <span className="text-2xl font-bold tracking-tight">Hawk</span>
             </Link>
           </div>
 

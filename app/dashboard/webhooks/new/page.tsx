@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { api } from "../../../lib/api";
 import { useDashboard } from "../../DashboardContext";
+import { createWebhookPayload, webhooksService } from "@/app/service/webhook.service";
 import { 
   ArrowLeft, 
   Globe, 
@@ -15,15 +16,30 @@ import {
   Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function NewWebhookPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const { setSidebarOpen } = useDashboard();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: "",
     url: "",
     subscriptions: [] as string[],
+  });
+  const { mutate, isPending } = useMutation({
+    mutationFn: (payload: createWebhookPayload) => webhooksService.createWebhook(payload),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks"]
+      })
+      toast.success("Webhook created successfully!");
+      const newId = data.webhook.id;
+      router.push(`/dashboard/webhooks/${newId}`);
+    },
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to create webhook");
+    }
   });
 
   const availableEvents = [
@@ -46,27 +62,20 @@ export default function NewWebhookPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.name.trim()) {
+      return toast.error("Please enter a friendly name for this endpoint");
+    }
+
+    if (!formData.url.startsWith("http://") && !formData.url.startsWith("https://")) {
+      return toast.error("URL must start with http:// or https://");
+    }
+    
     if (formData.subscriptions.length === 0) {
       return toast.error("Please select at least one event type");
     }
 
-    setIsLoading(true);
-    try {
-      await api("/webhook", {
-        method: "POST",
-        body: JSON.stringify({
-          url: formData.url,
-          subscriptions: formData.subscriptions,
-          // name: formData.name // Backend might not support name yet based on schema audit
-        }),
-      });
-      toast.success("Webhook created successfully!");
-      router.push("/dashboard/webhooks");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create webhook");
-    } finally {
-      setIsLoading(false);
-    }
+    mutate(formData);
   };
 
   return (
@@ -95,10 +104,33 @@ export default function NewWebhookPage() {
             </div>
             
             <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label htmlFor="url" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  Destination URL
-                </label>
+          {/* Friendly Name */}
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              Friendly Name
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors">
+                <Shield className="h-4 w-4" />
+              </div>
+              <input
+                id="name"
+                type="text"
+                placeholder="e.g. Production API"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="block w-full rounded-xl border border-zinc-200 bg-white py-3 pl-10 pr-3 text-sm placeholder:text-zinc-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-zinc-800 dark:bg-black dark:focus:border-white dark:focus:ring-white transition-all shadow-sm"
+                required
+              />
+            </div>
+            <p className="text-[10px] text-zinc-400">A name to help you identify this endpoint in the dashboard.</p>
+          </div>
+
+          {/* Payload URL */}
+          <div className="space-y-1.5">
+            <label htmlFor="url" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              Payload URL
+            </label>
                 <input
                   id="url"
                   type="url"
@@ -170,10 +202,10 @@ export default function NewWebhookPage() {
             </Link>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isPending}
               className="flex items-center gap-2 rounded-lg bg-black px-8 py-3 text-sm font-bold text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 shadow-xl active:scale-[0.98] disabled:opacity-50"
             >
-              {isLoading ? (
+              {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Create Endpoint"

@@ -83,10 +83,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}>
         <div className="flex items-center justify-between px-2 mb-10">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white shadow-lg shadow-black/10 dark:shadow-white/5">
-              <Code2 className="h-5 w-5 text-white dark:text-black" />
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
+              <img src="/favicon.png" alt="Hawk Logo" className="h-full w-full object-contain dark:invert" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
           </div>
           <button 
             className="rounded-lg p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 lg:hidden"

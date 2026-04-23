@@ -8,11 +8,11 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-zinc-800 dark:bg-black/80">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white shadow-md shadow-black/10 dark:shadow-white/5">
-              <Code2 className="h-4 w-4 text-white dark:text-black" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
+              <img src="/favicon.png" alt="Hawk Logo" className="h-full w-full object-contain dark:invert" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Hawk</span>
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
           </div>
           <div className="hidden items-center gap-8 md:flex">
             <Link href="#features" className="text-sm font-medium text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white transition-colors">Features</Link>
@@ -170,9 +170,11 @@ export default function LandingPage() {
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-12 px-4 bg-zinc-50 dark:bg-black">
         <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-10 items-start">
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <Code2 className="h-5 w-5" />
-              <span className="text-xl font-bold tracking-tight">Hawk</span>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden">
+                <img src="/favicon.png" alt="Hawk Logo" className="h-full w-full object-contain dark:invert" />
+              </div>
+              <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Hawk</span>
             </div>
             <p className="text-zinc-500 max-w-xs text-xs leading-5">The modern infrastructure for reliable, secure, and observable webhook delivery.</p>
           </div>
