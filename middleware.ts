@@ -3,18 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Protect /dashboard routes
-  if (pathname.startsWith('/dashboard')) {
-    const accessToken = request.cookies.get('accessToken')
-    const refreshToken = request.cookies.get('refreshToken')
-
-    // If no access token AND no refresh token
-    if (!accessToken && !refreshToken) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('message', 'Please sign in to access your dashboard.')
-      return NextResponse.redirect(loginUrl)
-    }
-  }
+  // Note: We cannot use Next.js middleware to check authentication when the 
+  // backend API is hosted on a different domain (Leapcell vs Vercel). 
+  // The browser will only send the httpOnly auth cookies to Leapcell, not Vercel.
+  // Authentication will be handled entirely on the client-side inside the dashboard.
 
   return NextResponse.next()
 }
