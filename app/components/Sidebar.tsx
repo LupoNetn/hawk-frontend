@@ -25,6 +25,7 @@ const menuItems = [
   { icon: Webhook, label: "Webhooks", href: "/dashboard/webhooks" },
   { icon: History, label: "Delivery Logs", href: "/dashboard/logs" },
   { icon: Key, label: "API Keys", href: "/dashboard/keys" },
+  { icon: Code2, label: "Documentation", href: "/docs" },
 ];
 
 const secondaryItems = [

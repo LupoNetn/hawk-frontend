@@ -71,7 +71,7 @@ export default function LandingPage() {
                 Start for free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link href="#docs" className="group flex items-center gap-2 text-base font-semibold leading-6 hover:text-black dark:hover:text-white transition-colors">
+              <Link href="/docs" className="group flex items-center gap-2 text-base font-semibold leading-6 hover:text-black dark:hover:text-white transition-colors">
                 Read documentation 
                 <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
               </Link>
@@ -183,7 +183,7 @@ export default function LandingPage() {
             <ul className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400">
               <li><Link href="#" className="hover:text-black dark:hover:text-white transition-colors">Features</Link></li>
               <li><Link href="#" className="hover:text-black dark:hover:text-white transition-colors">Pricing</Link></li>
-              <li><Link href="#" className="hover:text-black dark:hover:text-white transition-colors">Documentation</Link></li>
+              <li><Link href="/docs" className="hover:text-black dark:hover:text-white transition-colors">Documentation</Link></li>
             </ul>
           </div>
           <div>
