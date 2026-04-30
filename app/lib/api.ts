@@ -1,5 +1,5 @@
 const isProd = process.env.NODE_ENV === 'production';
-const defaultUrl = isProd ? "https://hawk-luponetn2623-4ci0me7u.leapcell.dev" : "http://localhost:6060";
+const defaultUrl = isProd ? "https://hawk-server.vercel.app" : "http://localhost:6060";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || defaultUrl;
 
 let isRefreshing = false;

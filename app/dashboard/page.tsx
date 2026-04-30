@@ -13,42 +13,43 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getMe } from "../service/auth.service";
+import { getDashboardStats, getDeliveries } from "../service/dashboard.service";
 import { toast } from "react-hot-toast";
 import { useDashboard } from "./DashboardContext";
 
-const stats = [
-  { label: "Total Events", value: "12,482", icon: Zap, trend: { value: "12%", isUp: true } },
-  { label: "Success Rate", value: "99.2%", icon: CheckCircle2, trend: { value: "0.5%", isUp: true } },
-  { label: "Failed Deliveries", value: "42", icon: AlertCircle, trend: { value: "2%", isUp: false } },
-  { label: "Avg. Latency", value: "48ms", icon: Clock, trend: { value: "4ms", isUp: true } },
-];
-
-const recentActivity = [
-  { id: 1, type: "payment.succeeded", status: "delivered", time: "2 mins ago", endpoint: "https://api.myapp.com/webhooks" },
-  { id: 2, type: "user.created", status: "delivered", time: "5 mins ago", endpoint: "https://api.myapp.com/webhooks" },
-  { id: 3, type: "order.placed", status: "failed", time: "12 mins ago", endpoint: "https://hooks.slack.com/services/..." },
-  { id: 4, type: "subscription.deleted", status: "delivered", time: "18 mins ago", endpoint: "https://api.myapp.com/webhooks" },
-  { id: 5, type: "invoice.paid", status: "delivered", time: "25 mins ago", endpoint: "https://api.myapp.com/webhooks" },
-];
-
 export default function DashboardPage() {
   const [org, setOrg] = useState<any>(null);
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setSidebarOpen } = useDashboard();
 
   useEffect(() => {
-    const fetchOrg = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getMe();
-        setOrg(response.data);
+        const [orgRes, statsRes, deliveriesRes] = await Promise.all([
+          getMe(),
+          getDashboardStats(),
+          getDeliveries({ limit: 5 })
+        ]);
+        setOrg(orgRes.data);
+        setDashboardStats(statsRes.data);
+        setRecentActivity(deliveriesRes.data);
       } catch (err: any) {
-        toast.error("Failed to load organization profile");
+        toast.error("Failed to load dashboard data");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchOrg();
+    fetchData();
   }, []);
+
+  const statsList = [
+    { label: "Total Events", value: dashboardStats?.overview?.totalEvents || 0, icon: Zap },
+    { label: "Success Rate", value: `${dashboardStats?.overview?.successRate || 0}%`, icon: CheckCircle2 },
+    { label: "Total Deliveries", value: dashboardStats?.overview?.totalDeliveries || 0, icon: AlertCircle },
+    { label: "Active Webhooks", value: dashboardStats?.overview?.activeWebhooks || 0, icon: Clock },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -60,9 +61,22 @@ export default function DashboardPage() {
       <div className="p-4 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <StatsCard key={stat.label} {...stat} />
-          ))}
+          {isLoading ? (
+            // Skeleton Stats
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
+                  <div className="h-8 w-8 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
+                </div>
+                <div className="h-8 w-16 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
+              </div>
+            ))
+          ) : (
+            statsList.map((stat) => (
+              <StatsCard key={stat.label} {...stat} />
+            ))
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3">
@@ -76,23 +90,42 @@ export default function DashboardPage() {
             </div>
             
             <div className="divide-y divide-zinc-100 dark:divide-zinc-800 overflow-x-auto">
-              {recentActivity.map((item) => (
-                <div key={item.id} className="flex items-center justify-between px-4 sm:px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors group min-w-[400px] sm:min-w-0">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className={`h-2 w-2 rounded-full shrink-0 ${item.status === 'delivered' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold font-mono truncate">{item.type}</p>
-                      <p className="text-[10px] sm:text-xs text-zinc-500 truncate max-w-[150px] sm:max-w-xs">{item.endpoint}</p>
+              {isLoading ? (
+                // Skeleton List
+                [1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center justify-between px-4 sm:px-6 py-4">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full">
+                      <div className="h-2 w-2 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+                      <div className="space-y-2 w-full max-w-xs">
+                        <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
+                        <div className="h-3 w-48 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-                    <span className="text-[10px] font-medium text-zinc-400">{item.time}</span>
-                    <button className="text-zinc-400 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
-                  </div>
+                ))
+              ) : recentActivity.length === 0 ? (
+                <div className="p-8 text-center text-zinc-500 text-sm">
+                  No deliveries yet. Try triggering an event!
                 </div>
-              ))}
+              ) : (
+                recentActivity.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between px-4 sm:px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors group min-w-[400px] sm:min-w-0">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={`h-2 w-2 rounded-full shrink-0 ${item.status === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold font-mono truncate">{item.event?.type}</p>
+                        <p className="text-[10px] sm:text-xs text-zinc-500 truncate max-w-[150px] sm:max-w-xs">{item.webhook?.url}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                      <span className="text-[10px] font-medium text-zinc-400">{new Date(item.createdAt).toLocaleTimeString()}</span>
+                      <Link href="/dashboard/logs" className="text-zinc-400 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -104,7 +137,7 @@ export default function DashboardPage() {
               
               <ul className="space-y-4">
                 {[
-                  { label: "Create your first webhook", done: true },
+                  { label: "Create your first webhook", done: dashboardStats?.overview?.activeWebhooks > 0 },
                   { label: "Verify your domain", done: false },
                   { label: "Configure HMAC secrets", done: false },
                 ].map((step, i) => (
@@ -117,22 +150,10 @@ export default function DashboardPage() {
                 ))}
               </ul>
 
-              <button className="mt-8 w-full rounded-lg bg-white py-2 text-xs font-bold text-black hover:bg-zinc-200 transition-all flex items-center justify-center gap-2">
+              <Link href="/dashboard/webhooks" className="mt-8 w-full rounded-lg bg-white py-2 text-xs font-bold text-black hover:bg-zinc-200 transition-all flex items-center justify-center gap-2">
                 Continue Setup
                 <ArrowUpRight className="h-3 w-3" />
-              </button>
-            </div>
-
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/50">
-              <h4 className="text-sm font-bold mb-4">Integrations</h4>
-              <div className="grid grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 w-10 rounded-lg bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
-                    <div className="h-5 w-5 bg-zinc-300 dark:bg-zinc-600 rounded-sm" />
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-[10px] text-zinc-500">Connect your favorite tools to automate your workflow.</p>
+              </Link>
             </div>
           </div>
         </div>
