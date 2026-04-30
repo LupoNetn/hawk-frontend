@@ -27,18 +27,24 @@ export function DocsHeader({ onMenuClick, isLoggedIn }: DocsHeaderProps) {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-sm font-medium text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white transition-colors flex items-center gap-2">
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
-          </Link>
-          {isLoggedIn === false && (
-            <Link 
-              href="/signup" 
-              className="hidden sm:block rounded-full bg-black px-5 py-1.5 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all"
-            >
-              Get Started
+          {isLoggedIn === true ? (
+            <Link href="/dashboard" className="text-sm font-medium text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white transition-colors flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
             </Link>
-          )}
+          ) : isLoggedIn === false ? (
+            <>
+              <Link href="/login" className="text-sm font-medium text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white transition-colors">
+                Login
+              </Link>
+              <Link 
+                href="/signup" 
+                className="hidden sm:block rounded-full bg-black px-5 py-1.5 text-xs font-bold text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all"
+              >
+                Sign Up
+              </Link>
+            </>
+          ) : null}
         </div>
       </div>
     </nav>
