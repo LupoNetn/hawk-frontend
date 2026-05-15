@@ -1,5 +1,5 @@
 const isProd = process.env.NODE_ENV === 'production';
-const defaultUrl = isProd ? "https://hawk-server.vercel.app" : "http://localhost:6060";
+const defaultUrl = isProd ? "https://hawk-w7w8.onrender.com" : "http://localhost:6060";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || defaultUrl;
 
 let isRefreshing = false;

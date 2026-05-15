@@ -54,7 +54,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col">
       <Header 
-        title={org ? `Welcome, ${org.name}` : "Overview"} 
+        title={org ? `Welcome, ${org.email.split('@')[0]}` : "Overview"} 
         onMenuClick={() => setSidebarOpen(true)}
       />
       
